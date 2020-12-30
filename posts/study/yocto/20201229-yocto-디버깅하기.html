@@ -39,10 +39,14 @@
 <li>패치파일</li>
 </ul>
 <h2 id="에러가-났을때-로그-확인하기"><a href="#에러가-났을때-로그-확인하기" class="headerlink" title="에러가 났을때, 로그 확인하기"></a>에러가 났을때, 로그 확인하기</h2><p>일단, 에러가 났다면 다음과 같이 <code>-v</code> 옵션을 켜서 빌드합니다.</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitbake core-image-minimal -v</span><br></pre></td></tr></table></figure>
+<pre><code class="bash">bitbake core-image-minimal -v</code></pre>
 <p>빌드과정중에, 직관적으로 에러가 나는부분에 대해서 로그를 보시고 디버깅을 시작하시면됩니다. 또한, 특정 과정중에 에러가 났다면 <code>WORKDIR</code> 내의 <code>temp</code> 폴더 밑에 가면 로그들도 유용한 역을 합니다.</p>
 <p>예를들어, busybox 를 빌드하다 <code>do_install</code> 과정중에 어러가 났다고 한다면, <code>WORKDIR</code> 내의 <code>temp</code> 폴더에 가면 다음과 같이 <code>do_install</code> 에 대한 로그들을 볼수있습니다.</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mypath/busybox/1.27.2-r0/temp$ ls -al *do_instal*</span><br><span class="line">lrwxrwxrwx 1 myuser myuser    22 12월 29 14:48 log.do_install -&gt; log.do_install.2051661</span><br><span class="line">-rw-r--r-- 1 myuser myuser  2077 12월 29 14:48 log.do_install.2051661</span><br><span class="line">lrwxrwxrwx 1 myuser myuser    22 12월 29 14:48 run.do_install -&gt; run.do_install.2051661</span><br><span class="line">-rwxr-xr-x 1 myuser myuser 23086 12월 29 14:48 run.do_install.2051661</span><br></pre></td></tr></table></figure>
+<pre><code class="sh">mypath/busybox/1.27.2-r0/temp$ ls -al *do_instal*
+lrwxrwxrwx 1 myuser myuser    22 12월 29 14:48 log.do_install -&gt; log.do_install.2051661
+-rw-r--r-- 1 myuser myuser  2077 12월 29 14:48 log.do_install.2051661
+lrwxrwxrwx 1 myuser myuser    22 12월 29 14:48 run.do_install -&gt; run.do_install.2051661
+-rwxr-xr-x 1 myuser myuser 23086 12월 29 14:48 run.do_install.2051661</code></pre>
 <ol>
 <li><code>log.do_install</code> 파일에 빌드과정중의 에러들이 기록되어있을겁니다. 해당 기록만봐서는 정확히 어느과정중에 에러가 났는지 알기 어렵습니다.</li>
 <li><code>log.do_install</code> 의 내용을 <code>run.do_install</code> 와 함께 유추해봅니다. 해당 파일은 욕토 빌드과정중에 완성된 형태의 스크립트 입니다. 즉, 욕토과정중에 어떠한 변수들이 어떻게 들어갔는지 해당 파일을 열어보면 알수있습니다. (컴파일과정이라면, 컴파일러 옵션까지 모두 확인가능합니다.) <code>log.do_install</code> 로그는 완성된 형태의 스크립트 실행도중에 에러를 기준으로 남기게 됩니다.</li>

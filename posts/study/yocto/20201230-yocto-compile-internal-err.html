@@ -9,7 +9,13 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">It almost looks like an internal compiler error but not quite</span><br><span class="line">since at least until recently, any time the compiler</span><br><span class="line">died, it would produce and log that included the</span><br><span class="line">    &quot;internal compiler error&quot;</span><br><span class="line">string like this one:</span><br><span class="line">    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57872</span><br><span class="line">and I don&#x27;t see that here... hmmm.</span><br></pre></td></tr></table></figure>
+<pre><code class="text">It almost looks like an internal compiler error but not quite
+since at least until recently, any time the compiler
+died, it would produce and log that included the
+    &quot;internal compiler error&quot;
+string like this one:
+    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57872
+and I don&#39;t see that here... hmmm.</code></pre>
 <h2 id="발생원인"><a href="#발생원인" class="headerlink" title="발생원인"></a>발생원인</h2><p>사실 발생원인에 대해서는 추측만합니다. 관련하여 다른 개발자 지인과 이야기를 해보니… 그냥 host pc 가 문제인것 같습니다.</p>
 <ul>
 <li>특정 cpu 에러? os 와의 호환성?<ul>
@@ -27,12 +33,25 @@
 <p>ㅠㅠ 한마디로 해결책이 엉망진창입니다. 이런해결은 그냥 임시방편.</p>
 </blockquote>
 <h3 id="cpu의-동시-작업-이슈인것으로-판단하여-조치"><a href="#cpu의-동시-작업-이슈인것으로-판단하여-조치" class="headerlink" title="cpu의 동시 작업 이슈인것으로 판단하여 조치"></a>cpu의 동시 작업 이슈인것으로 판단하여 조치</h3><p>저같은경우 <code>boost</code> 패키지에서 계속적으로 다음과 같은 에러가 났습니다.</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">It almost looks like an internal compiler error but not quite</span><br><span class="line">since at least until recently, any time the compiler</span><br><span class="line">died, it would produce and log that included the</span><br><span class="line">    &quot;internal compiler error&quot;</span><br><span class="line">string like this one:</span><br><span class="line">    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57872</span><br><span class="line">and I don&#x27;t see that here... hmmm.</span><br></pre></td></tr></table></figure>
+<pre><code class="text">It almost looks like an internal compiler error but not quite
+since at least until recently, any time the compiler
+died, it would produce and log that included the
+    &quot;internal compiler error&quot;
+string like this one:
+    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57872
+and I don&#39;t see that here... hmmm.</code></pre>
 <p>특이사항은 간혹 pc 가 엄청 느려질 만큼 job 들이 꼬여지는 일이 발생하였습니다.</p>
 <p>일단, 특정 cpu + os 에서만 발생하고 코드상에는 전혀 문제가 없고, pc 가 물리적으로 느려지는것으로 볼때 컴파일러의 <code>job</code> 과 관련이 생각되어 다음과 같이 수정을 해봣습니다.</p>
 <h4 id="boost-패키지에-대한-job-수정"><a href="#boost-패키지에-대한-job-수정" class="headerlink" title="boost 패키지에 대한 job 수정"></a>boost 패키지에 대한 job 수정</h4><p>계속 말썽을 일으켰던 boost 의 레시피를 보면 다음과 같은 내용이 있습니다.</p>
 <p>-<code>/boost/boost.inc</code></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># https://svn.boost.org/trac/boost/ticket/7634</span></span><br><span class="line">BOOST_PARALLEL_MAKE = <span class="string">&quot;<span class="variable">$&#123;@oe.utils.parallel_make_argument(d, &#x27;-j%d&#x27;, limit=16)&#125;</span>&quot;</span></span><br><span class="line">BJAM_OPTS    = <span class="string">&#x27;$&#123;BOOST_PARALLEL_MAKE&#125; -d+2 -q \</span></span><br><span class="line"><span class="string">                $&#123;BJAM_TOOLS&#125; \</span></span><br><span class="line"><span class="string">                -sBOOST_BUILD_USER_CONFIG=$&#123;WORKDIR&#125;/user-config.jam \</span></span><br><span class="line"><span class="string">                --build-dir=$&#123;S&#125;/$&#123;TARGET_SYS&#125; \</span></span><br><span class="line"><span class="string">                --disable-icu \</span></span><br><span class="line"><span class="string">                $&#123;BJAM_EXTRA&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="sh"># https://svn.boost.org/trac/boost/ticket/7634
+BOOST_PARALLEL_MAKE = &quot;$&#123;@oe.utils.parallel_make_argument(d, &#39;-j%d&#39;, limit=16)&#125;&quot;
+BJAM_OPTS    = &#39;$&#123;BOOST_PARALLEL_MAKE&#125; -d+2 -q \
+                $&#123;BJAM_TOOLS&#125; \
+                -sBOOST_BUILD_USER_CONFIG=$&#123;WORKDIR&#125;/user-config.jam \
+                --build-dir=$&#123;S&#125;/$&#123;TARGET_SYS&#125; \
+                --disable-icu \
+                $&#123;BJAM_EXTRA&#125;&#39;</code></pre>
 <p><code>BOOST_PARALLEL_MAKE</code> 변수가 컴파일러 <code>job</code> 에 대한 변수인것 같습니다.</p>
 <p>해당의 limit 을 <code>limit=4</code> 와 같이 숫자를 조정하여 job 갯수를 줄여줍니다. 즉 job 이문제가 되니, job 갯수를 확줄여버린거죠.</p>
 <blockquote>

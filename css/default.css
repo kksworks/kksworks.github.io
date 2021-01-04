@@ -23342,3 +23342,16 @@ figure.highlight .section {
   box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.5);
   border-radius: 5px;
 }
+.article .article-tags {
+  padding-top: 1.2em;
+  padding-bottom: 1.2em;
+  border-top: 1px;
+}
+.article .article-tags a {
+  background: #21a147;
+  color: #fff;
+  border-radius: 5px;
+  margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  font-size: 1.2em;
+}
